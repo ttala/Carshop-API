@@ -1,16 +1,21 @@
-from flask import Flask
-from dotenv import load_dotenv
+
 import pandas as pd
-from database import db
-import os
+from flask import Flask
 from model import *
+import os
+from dotenv import load_dotenv
 
 app = Flask(__name__)
-
 load_dotenv(override=True)
-#engine = create_engine(os.environ.get("DATABASE_URL"))
-app.config ['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL") 
+app.config['SQLALCHEMY_DATABASE_URI'] = '{database_url}'.format(database_url=os.environ['DATABASE_URL'])
+
+# connect the app to the database
 db.init_app(app)
+
+
+with app.app_context():
+    db.create_all()
+
 
 def reset_db():
         db.drop_all()
@@ -31,7 +36,7 @@ def reset_db():
 
 with app.app_context():
     reset_db()
-    
+
 @app.get("/")
 def get_index():
     return {"Project name": "ShopCars"}
